@@ -80,6 +80,8 @@ h5, .h5 { font-size: 1rem; }
 [data-bs-theme="dark"] .navbar-brand,
 [data-bs-theme="dark"] .navbar-brand:hover { color: #f1f1f1; }
 
+.navbar-brand img { border-radius: 6px; }
+
 /* Theme toggle: a bare moon/sun icon. */
 .theme-toggle {
   background: none;
@@ -141,7 +143,6 @@ tr.leader .col-rank {
 .cell-link:hover { color: var(--brand); }
 
 .team-logo {
-  border-radius: 6px;
   object-fit: contain;
   flex: none;
 }

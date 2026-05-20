@@ -1,14 +1,30 @@
 import { loadData, getEventParticipants } from './data.js';
 import {
   el, teamCell, dataTable, eventState, eventWhen,
-  formatPoints, formatScore, showError, showNotFound,
+  formatPoints, formatScore, showError, showNotFound, showLoading,
 } from './render.js';
 
-const contentEl = document.getElementById('content');
+export async function renderEvent(app, id) {
+  showLoading(app);
 
-function render({ event, participants }) {
+  let data;
+  try {
+    data = await loadData();
+  } catch (err) {
+    console.error(err);
+    showError(app, "Couldn't load the league data. Please try again later.");
+    return;
+  }
+
+  const result = getEventParticipants(data, id);
+  if (!result) {
+    document.title = 'Event not found - Human Flag League';
+    showNotFound(app, 'Event not found', `There is no event with the id "${id}".`);
+    return;
+  }
+
+  const { event, participants } = result;
   document.title = `${event.name} - Human Flag League`;
-  contentEl.removeAttribute('aria-busy');
 
   const header = el('div', { class: 'mb-3' }, [
     el('h1', { class: 'h3 mb-1' }, event.name),
@@ -42,31 +58,9 @@ function render({ event, participants }) {
     );
   }
 
-  contentEl.replaceChildren(header, body);
+  app.replaceChildren(
+    el('p', { class: 'mb-3' }, el('a', { href: '/', class: 'back-link' }, '← Scoreboard')),
+    header,
+    body
+  );
 }
-
-async function init() {
-  const id = new URLSearchParams(location.search).get('id');
-  if (!id) {
-    showNotFound(contentEl, 'Event not found', 'No event was specified in the link.');
-    return;
-  }
-
-  let data;
-  try {
-    data = await loadData();
-  } catch (err) {
-    console.error(err);
-    showError(contentEl, "Couldn't load the league data. Please try again later.");
-    return;
-  }
-
-  const result = getEventParticipants(data, id);
-  if (!result) {
-    showNotFound(contentEl, 'Event not found', `There is no event with the id "${id}".`);
-    return;
-  }
-  render(result);
-}
-
-init();

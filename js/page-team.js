@@ -1,10 +1,8 @@
 import { loadData, getTeamBreakdown } from './data.js';
 import {
   el, teamLogo, countryBadge, eventLink, dataTable,
-  formatDate, formatPoints, showError, showNotFound,
+  formatDate, formatPoints, showError, showNotFound, showLoading,
 } from './render.js';
-
-const contentEl = document.getElementById('content');
 
 function yearSection(y) {
   const head = el('div', { class: 'd-flex flex-wrap align-items-baseline gap-2 mt-4 mb-2' }, [
@@ -36,16 +34,33 @@ function yearSection(y) {
   return el('section', {}, [head, table]);
 }
 
-function render({ team, years, overallTotal }) {
+export async function renderTeam(app, id) {
+  showLoading(app);
+
+  let data;
+  try {
+    data = await loadData();
+  } catch (err) {
+    console.error(err);
+    showError(app, "Couldn't load the league data. Please try again later.");
+    return;
+  }
+
+  const breakdown = getTeamBreakdown(data, id);
+  if (!breakdown) {
+    document.title = 'Team not found - Human Flag League';
+    showNotFound(app, 'Team not found', `There is no team with the id "${id}".`);
+    return;
+  }
+
+  const { team, years, overallTotal } = breakdown;
   document.title = `${team.name} - Human Flag League`;
-  contentEl.removeAttribute('aria-busy');
 
   const info = el('div', { class: 'flex-grow-1' }, [
     el('h1', { class: 'h3 mb-1' }, [team.name, ' ', countryBadge(team.country)]),
     team.description ? el('p', { class: 'mb-1' }, team.description) : null,
     team.aliases && team.aliases.length
-      ? el('p', { class: 'text-secondary small mb-1' },
-          `Aliases: ${team.aliases.join(', ')}`)
+      ? el('p', { class: 'text-secondary small mb-1' }, `Aliases: ${team.aliases.join(', ')}`)
       : null,
     team.web
       ? el('a', {
@@ -70,31 +85,9 @@ function render({ team, years, overallTotal }) {
     ? years.map(yearSection)
     : [el('p', { class: 'text-secondary' }, 'This team has not played any events yet.')];
 
-  contentEl.replaceChildren(header, ...body);
+  app.replaceChildren(
+    el('p', { class: 'mb-3' }, el('a', { href: '/teams', class: 'back-link' }, '← Teams')),
+    header,
+    ...body
+  );
 }
-
-async function init() {
-  const id = new URLSearchParams(location.search).get('id');
-  if (!id) {
-    showNotFound(contentEl, 'Team not found', 'No team was specified in the link.');
-    return;
-  }
-
-  let data;
-  try {
-    data = await loadData();
-  } catch (err) {
-    console.error(err);
-    showError(contentEl, "Couldn't load the league data. Please try again later.");
-    return;
-  }
-
-  const breakdown = getTeamBreakdown(data, id);
-  if (!breakdown) {
-    showNotFound(contentEl, 'Team not found', `There is no team with the id "${id}".`);
-    return;
-  }
-  render(breakdown);
-}
-
-init();

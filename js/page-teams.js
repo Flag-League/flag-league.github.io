@@ -1,7 +1,5 @@
 import { loadData } from './data.js';
-import { el, teamLogo, countryBadge, teamHref, showError, showEmpty } from './render.js';
-
-const gridEl = document.getElementById('teams-grid');
+import { el, teamLogo, countryBadge, teamHref, showError, showLoading } from './render.js';
 
 function card(team) {
   return el('div', { class: 'col' },
@@ -32,25 +30,27 @@ function card(team) {
       ])));
 }
 
-async function init() {
+export async function renderTeams(app) {
+  document.title = 'Teams - Human Flag League';
+  showLoading(app);
+
   let data;
   try {
     data = await loadData();
   } catch (err) {
     console.error(err);
-    showError(gridEl, "Couldn't load the league data. Please try again later.");
+    showError(app, "Couldn't load the league data. Please try again later.");
     return;
   }
 
-  if (!data.teams.length) {
-    showEmpty(gridEl, 'No teams yet.');
-    return;
-  }
-  gridEl.removeAttribute('aria-busy');
-  gridEl.replaceChildren(
-    el('div', { class: 'row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3' },
-      data.teams.map(card))
+  const head = [
+    el('h1', { class: 'mb-1' }, 'Teams'),
+    el('p', { class: 'lead text-secondary mb-4' }, 'The teams competing in the league.'),
+  ];
+  app.replaceChildren(
+    ...head,
+    data.teams.length
+      ? el('div', { class: 'row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3' }, data.teams.map(card))
+      : el('p', { class: 'text-secondary text-center py-5' }, 'No teams yet.')
   );
 }
-
-init();

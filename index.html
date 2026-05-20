@@ -6,24 +6,35 @@
   <title>Human Flag League</title>
   <meta name="description" content="CTF League without Clankers. Made by humans, made for humans.">
 
-  <link rel="icon" type="image/svg+xml" href="ctf-league.svg">
+  <link rel="icon" type="image/svg+xml" href="/img/ctf-league.svg">
 
   <meta property="og:title" content="Human Flag League">
   <meta property="og:description" content="CTF League without Clankers. Made by humans, made for humans.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://flag-league.github.io/">
-  <meta property="og:image" content="https://flag-league.github.io/og-image.png">
+  <meta property="og:image" content="https://flag-league.github.io/img/og-image.png">
   <meta name="twitter:card" content="summary">
 
+  <script>
+    // Restore a deep-link path that 404.html encoded into the query string.
+    (function (l) {
+      if (l.search[1] === '/') {
+        var decoded = l.search.slice(1).split('&').map(function (s) {
+          return s.replace(/~and~/g, '&');
+        }).join('?');
+        history.replaceState(null, null, l.pathname.slice(0, -1) + decoded + l.hash);
+      }
+    }(window.location));
+  </script>
   <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('theme')||'light');</script>
-  <link rel="stylesheet" href="vendor/bootstrap.min.css">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <nav class="navbar navbar-expand-md border-bottom site-navbar">
     <div class="container">
-      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
-        <img src="ctf-league.svg" alt="" width="30" height="30">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+        <img src="/img/ctf-league.svg" alt="" width="30" height="30">
         <span>Human Flag League</span>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,36 +42,20 @@
       </button>
       <div class="collapse navbar-collapse" id="nav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.html">Scoreboard</a></li>
-          <li class="nav-item"><a class="nav-link" href="teams.html">Teams</a></li>
-          <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+          <li class="nav-item"><a class="nav-link" data-nav="scoreboard" href="/">Scoreboard</a></li>
+          <li class="nav-item"><a class="nav-link" data-nav="teams" href="/teams">Teams</a></li>
+          <li class="nav-item"><a class="nav-link" data-nav="about" href="/about">About</a></li>
         </ul>
       </div>
     </div>
   </nav>
 
-  <main class="container py-4">
-    <h1 class="mb-1">Stop the slopping in CTFs.</h1>
-    <p class="hero-tagline mb-4">This CTF league is an attempt to make playing CTFs fun again.<br/>We follow a strict non-AI policy and don't care about Clankers and their teams.</p>
-
+  <main class="container py-4" id="app">
     <noscript>
       <div class="alert alert-warning">This site is built in your browser. Please enable JavaScript.</div>
     </noscript>
-
-    <div class="row g-4">
-      <div class="col-lg-8">
-        <h2 class="h4 mb-3">Scoreboard</h2>
-        <ul class="nav nav-tabs" id="year-tabs" role="tablist"></ul>
-        <div class="tab-content pt-3" id="year-panes" aria-busy="true">
-          <div class="text-center text-secondary py-5">
-            <div class="spinner-border" role="status"><span class="visually-hidden">Loading</span></div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4">
-        <h2 class="h4 mb-3">Events</h2>
-        <div id="events-sidebar"></div>
-      </div>
+    <div class="text-center text-secondary py-5">
+      <div class="spinner-border" role="status"><span class="visually-hidden">Loading</span></div>
     </div>
   </main>
 
@@ -73,8 +68,8 @@
     </button>
   </footer>
 
-  <script src="vendor/bootstrap.bundle.min.js" defer></script>
-  <script type="module" src="js/theme.js"></script>
-  <script type="module" src="js/page-scoreboard.js"></script>
+  <script src="/vendor/bootstrap.bundle.min.js" defer></script>
+  <script type="module" src="/js/theme.js"></script>
+  <script type="module" src="/js/app.js"></script>
 </body>
 </html>

@@ -76,11 +76,11 @@ export function eventWhen(event, nowSeconds = Date.now() / 1000) {
 }
 
 export function teamHref(team) {
-  return `team.html?id=${encodeURIComponent(team.id)}`;
+  return `/team/${encodeURIComponent(team.id)}`;
 }
 
 export function eventHref(eventId) {
-  return `event.html?id=${encodeURIComponent(eventId)}`;
+  return `/event/${encodeURIComponent(eventId)}`;
 }
 
 export function teamLogo(team, size = 28) {
@@ -90,10 +90,10 @@ export function teamLogo(team, size = 28) {
     height: size,
     loading: 'lazy',
     alt: '',
-    src: team.logo_url || 'ctf-league.svg',
+    src: team.logo_url || '/img/ctf-league.svg',
   });
   img.addEventListener('error', () => {
-    if (!img.src.endsWith('ctf-league.svg')) img.src = 'ctf-league.svg';
+    if (!img.src.endsWith('/img/ctf-league.svg')) img.src = '/img/ctf-league.svg';
   }, { once: true });
   return img;
 }
@@ -130,25 +130,24 @@ export function dataTable(columns, rows) {
     ]));
 }
 
+export function showLoading(container) {
+  container.replaceChildren(
+    el('div', { class: 'text-center text-secondary py-5' },
+      el('div', { class: 'spinner-border', role: 'status' },
+        el('span', { class: 'visually-hidden' }, 'Loading')))
+  );
+}
+
 export function showError(container, message) {
-  container.removeAttribute('aria-busy');
   container.replaceChildren(
     el('div', { class: 'alert alert-danger', role: 'alert' }, message)
   );
 }
 
-export function showEmpty(container, message) {
-  container.removeAttribute('aria-busy');
-  container.replaceChildren(
-    el('p', { class: 'text-secondary text-center py-5' }, message)
-  );
-}
-
 export function showNotFound(container, title, message) {
-  container.removeAttribute('aria-busy');
   container.replaceChildren(
     el('h1', { class: 'h3' }, title),
     el('p', { class: 'text-secondary' }, message),
-    el('a', { href: 'index.html', class: 'btn btn-primary' }, 'Back to the scoreboard')
+    el('a', { href: '/', class: 'btn btn-primary' }, 'Back to the scoreboard')
   );
 }

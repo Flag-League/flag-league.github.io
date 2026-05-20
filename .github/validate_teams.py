@@ -14,8 +14,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main() -> int:
-    data = json.loads((ROOT / "teams.json").read_text())
-    schema = json.loads((ROOT / "teams.schema.json").read_text())
+    data = json.loads((ROOT / "data" / "teams.json").read_text())
+    schema = json.loads((ROOT / "data" / "teams.schema.json").read_text())
 
     errors = []
 

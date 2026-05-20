@@ -7,7 +7,7 @@ export async function loadData() {
 
   let res;
   try {
-    res = await fetch('teams.json', { cache: 'no-cache' });
+    res = await fetch('/data/teams.json', { cache: 'no-cache' });
   } catch {
     throw new Error('Could not reach teams.json (network error).');
   }

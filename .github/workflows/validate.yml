@@ -3,14 +3,14 @@ name: Validate teams.json
 on:
   push:
     paths:
-      - teams.json
-      - teams.schema.json
+      - data/teams.json
+      - data/teams.schema.json
       - .github/validate_teams.py
       - .github/workflows/validate.yml
   pull_request:
     paths:
-      - teams.json
-      - teams.schema.json
+      - data/teams.json
+      - data/teams.schema.json
       - .github/validate_teams.py
   workflow_dispatch:
 

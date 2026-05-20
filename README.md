@@ -8,11 +8,11 @@ Live at <https://flag-league.github.io>
 It is a static site: plain HTML, CSS and a little JavaScript, no build step.
 Bootstrap is vendored in `vendor/`, so the site loads nothing from a CDN. The
 scoreboard, team pages and event pages are all computed in the browser from a
-single data file, `teams.json`.
+single data file, `data/teams.json`.
 
 ## Updating the data
 
-Everything the site shows comes from `teams.json`. It has two parts: a map of
+Everything the site shows comes from `data/teams.json`. It has two parts: a map of
 events, and a list of teams that reference those events.
 
 ```jsonc
@@ -63,7 +63,7 @@ python .github/validate_teams.py
 
 ## Local preview
 
-The pages fetch `teams.json` and use ES modules, so they need to be served over
+The pages fetch `data/teams.json` and use ES modules, so they need to be served over
 HTTP. Opening the files directly (`file://`) will not work.
 
 ```
