@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="robots" content="noindex">
+  <title>teams.json editor - Human Flag League</title>
+
+  <link rel="icon" type="image/svg+xml" href="ctf-league.svg">
+
+  <script>(function(){var t=localStorage.getItem('theme');if(!t)t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-bs-theme',t);})();</script>
+  <link rel="stylesheet" href="vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    html, body { height: 100%; }
+    body { margin: 0; }
+
+    .app { display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* Header */
+    .editor-header { background: #f8f9fa; position: sticky; top: 0; z-index: 30; }
+    [data-bs-theme="dark"] .editor-header { background: #000; }
+    .header-inner {
+      display: flex; align-items: center; gap: .75rem 1rem;
+      padding: .5rem 1.1rem; flex-wrap: wrap;
+    }
+    .brand {
+      display: flex; align-items: center; gap: .5rem;
+      text-decoration: none; color: var(--brand);
+      font-size: 1.02rem; white-space: nowrap;
+    }
+    .brand strong { font-weight: 800; }
+    .brand .brand-sub { font-weight: 500; opacity: .8; }
+    [data-bs-theme="dark"] .brand { color: #f1f1f1; }
+    .header-tools { display: flex; align-items: center; gap: .5rem; margin-left: auto; flex-wrap: wrap; }
+    .header-counts { font-size: .82rem; color: var(--bs-secondary-color); white-space: nowrap; }
+
+    .validity-badge {
+      font-size: .78rem; font-weight: 700; white-space: nowrap;
+      padding: .22rem .6rem; border-radius: 1rem;
+    }
+    .validity-badge.ok   { color: #0f7b3e; background: rgba(25,135,84,.15); }
+    .validity-badge.bad  { color: #dc3545; background: rgba(220,53,69,.15); }
+    .validity-badge.warn { color: #b5670b; background: rgba(253,126,20,.18); }
+    [data-bs-theme="dark"] .validity-badge.ok   { color: #4ade80; }
+    [data-bs-theme="dark"] .validity-badge.warn { color: #f0a04b; }
+
+    /* Workspace */
+    .workspace { flex: 1 1 auto; display: flex; flex-direction: column; }
+    .pane { min-width: 0; }
+    .pane-editor { background: var(--bs-body-bg); }
+    .pane-output { background: var(--bs-tertiary-bg); }
+
+    @media (min-width: 992px) {
+      html, body { overflow: hidden; }
+      .app { height: 100vh; }
+      .workspace { flex-direction: row; min-height: 0; }
+      .pane { height: 100%; overflow-y: auto; }
+      .pane-editor { flex: 1.3 1 0; }
+      .pane-output { flex: 1 1 0; border-left: 1px solid var(--bs-border-color); }
+    }
+
+    .pane-pad { padding: 1.1rem 1.35rem 4rem; }
+    .editor-intro { font-size: .85rem; color: var(--bs-secondary-color); margin-bottom: 1rem; }
+    .editor-intro code { font-size: .85em; }
+
+    /* Section headers */
+    .section-head { display: flex; align-items: center; gap: .55rem; margin: 1.5rem 0 .9rem; }
+    .section-head:first-of-type { margin-top: .25rem; }
+    .section-head h2 { font-size: 1.25rem; margin: 0; }
+    .section-count {
+      font-size: .78rem; font-weight: 700;
+      background: var(--bs-tertiary-bg); color: var(--bs-secondary-color);
+      border: 1px solid var(--bs-border-color);
+      border-radius: 1rem; padding: .03rem .55rem; line-height: 1.5;
+    }
+
+    /* Collapsible entry cards */
+    .entry-card { margin-bottom: .55rem; }
+    .entry-summary { display: flex; align-items: stretch; }
+    .entry-summary-btn {
+      flex: 1 1 auto; min-width: 0;
+      display: flex; align-items: center; gap: .65rem;
+      padding: .6rem .85rem; cursor: pointer;
+      background: none; border: 0; text-align: left; color: inherit;
+      border-radius: var(--bs-card-inner-border-radius);
+    }
+    .entry-summary-btn:hover { background: var(--bs-tertiary-bg); }
+    .entry-summary-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+    .chevron { flex: none; color: var(--bs-secondary-color); transition: transform .15s ease; line-height: 0; }
+    .entry-summary-btn[aria-expanded="true"] .chevron { transform: rotate(90deg); }
+    .entry-summary-main { min-width: 0; flex: 1 1 auto; }
+    .entry-title {
+      display: block; font-weight: 600;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .entry-title.muted-title { color: var(--bs-secondary-color); font-weight: 500; font-style: italic; }
+    .entry-sub {
+      display: block; font-size: .77rem; color: var(--bs-secondary-color);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .entry-badge {
+      flex: none; font-size: .71rem; font-weight: 700;
+      padding: .1rem .5rem; border-radius: 1rem; white-space: nowrap;
+    }
+    .entry-badge.bad  { color: #dc3545; background: rgba(220,53,69,.14); }
+    .entry-badge.warn { color: #b5670b; background: rgba(253,126,20,.16); }
+    [data-bs-theme="dark"] .entry-badge.warn { color: #f0a04b; }
+    .entry-summary .icon-btn { align-self: center; margin-right: .35rem; }
+    .entry-detail {
+      padding: .85rem .95rem 1rem;
+      border-top: 1px solid var(--bs-border-color);
+    }
+
+    .icon-btn {
+      background: none; border: 0; padding: .25rem; line-height: 0;
+      border-radius: .375rem; color: var(--bs-secondary-color); cursor: pointer;
+    }
+    .icon-btn:hover { color: #dc3545; background: rgba(220,53,69,.12); }
+
+    /* Fields */
+    .pane-editor .form-label {
+      font-size: .76rem; font-weight: 600; margin-bottom: .2rem;
+      color: var(--bs-secondary-color);
+    }
+    .field-hint, .field-msg { font-size: .76rem; margin-top: .22rem; line-height: 1.35; }
+    .field-hint { color: var(--bs-secondary-color); }
+    .field-msg-error { color: #dc3545; }
+    .field-msg-warn  { color: #c2700f; }
+    [data-bs-theme="dark"] .field-msg-warn { color: #f0a04b; }
+
+    .form-control.is-invalid, .form-control.is-warning,
+    .form-select.is-invalid {
+      background-image: none; padding-right: .7rem;
+    }
+    .form-control.is-warning { border-color: #fd7e14; }
+    .form-control.is-warning:focus {
+      border-color: #fd7e14; box-shadow: 0 0 0 .2rem rgba(253,126,20,.25);
+    }
+
+    .country-field { display: flex; align-items: center; gap: .5rem; }
+    .flag-preview { font-size: 1.4rem; line-height: 1; flex: none; }
+
+    /* Results inside an event */
+    .results-panel {
+      margin-top: 1rem; padding-top: .9rem;
+      border-top: 1px dashed var(--bs-border-color);
+    }
+    .results-panel-head {
+      font-size: .73rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .04em; color: var(--bs-secondary-color);
+      margin-bottom: .6rem;
+    }
+    .results-empty { font-size: .83rem; color: var(--bs-secondary-color); margin-bottom: .6rem; }
+    .result-row {
+      display: flex; flex-wrap: wrap; align-items: flex-end; gap: .55rem;
+      padding: .55rem .6rem; margin-bottom: .5rem;
+      border: 1px solid var(--bs-border-color); border-radius: .45rem;
+    }
+    .mini-field { display: flex; flex-direction: column; gap: .12rem; }
+    .mini-label {
+      font-size: .65rem; text-transform: uppercase; letter-spacing: .05em;
+      font-weight: 700; color: var(--bs-secondary-color);
+    }
+    .result-team-field { flex: 1 1 11rem; min-width: 8rem; }
+    .result-team-field .form-select { width: 100%; }
+    .result-row .mini-field .form-control { width: 6.5rem; }
+    .result-row .result-place { width: 5rem; }
+    .result-row .icon-btn { margin-bottom: .1rem; }
+
+    /* Empty states */
+    .empty-state {
+      text-align: center; padding: 2.25rem 1rem; font-size: .88rem;
+      color: var(--bs-secondary-color);
+      border: 1px dashed var(--bs-border-color); border-radius: .5rem;
+    }
+
+    /* Problems panel */
+    .problems {
+      border: 1px solid var(--bs-border-color); border-radius: .5rem;
+      overflow: hidden; margin-bottom: 1rem;
+    }
+    .problems-head {
+      padding: .5rem .75rem; font-size: .82rem; font-weight: 700;
+      background: var(--bs-tertiary-bg);
+      border-bottom: 1px solid var(--bs-border-color);
+    }
+    .problems-list { max-height: 12rem; overflow-y: auto; }
+    .problem {
+      display: flex; gap: .5rem; align-items: baseline;
+      padding: .38rem .75rem; font-size: .82rem; cursor: pointer;
+    }
+    .problem + .problem { border-top: 1px solid var(--bs-border-color); }
+    .problem:hover { background: var(--bs-tertiary-bg); }
+    .problem-dot { flex: none; font-size: .7rem; }
+    .problem.level-error .problem-dot { color: #dc3545; }
+    .problem.level-warning .problem-dot { color: #fd7e14; }
+    .problem-where { font-weight: 600; color: var(--bs-secondary-color); white-space: nowrap; }
+    .problem-msg { min-width: 0; }
+
+    /* Output pane */
+    .output-bar {
+      position: sticky; top: 0; z-index: 5;
+      display: flex; align-items: center; gap: .6rem;
+      padding: .55rem .9rem;
+      background: var(--bs-body-bg);
+      border-bottom: 1px solid var(--bs-border-color);
+    }
+    .output-title { font-size: .9rem; }
+    .output-meta { font-size: .76rem; color: var(--bs-secondary-color); }
+    .output-code {
+      margin: 0; padding: 1rem 1.1rem;
+      font-family: var(--bs-font-monospace);
+      font-size: .8rem; line-height: 1.65;
+      white-space: pre; overflow-x: auto;
+      color: var(--bs-emphasis-color);
+      tab-size: 2;
+    }
+    .btn.copied {
+      --bs-btn-bg: #198754; --bs-btn-border-color: #198754;
+      --bs-btn-hover-bg: #198754; --bs-btn-hover-border-color: #198754;
+    }
+
+    /* Theme toggle */
+    .theme-toggle {
+      background: none; border: 0; padding: .25rem; line-height: 0;
+      color: var(--bs-secondary-color); cursor: pointer;
+    }
+    .theme-toggle:hover { color: var(--brand); }
+    .theme-toggle .icon-sun { display: none; }
+    [data-bs-theme="dark"] .theme-toggle .icon-moon { display: none; }
+    [data-bs-theme="dark"] .theme-toggle .icon-sun { display: inline; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="editor-header border-bottom">
+      <div class="header-inner">
+        <a class="brand" href="index.html" title="Back to Human Flag League">
+          <img src="ctf-league.svg" alt="" width="26" height="26">
+          <span><strong>teams.json</strong> <span class="brand-sub">editor</span></span>
+        </a>
+        <div class="header-tools">
+          <span id="counts" class="header-counts d-none d-sm-inline"></span>
+          <span id="validity-badge" class="validity-badge ok">&#10003; Valid</span>
+          <button id="btn-github" type="button" class="btn btn-sm btn-outline-secondary">Load from GitHub</button>
+          <button id="theme-toggle" type="button" class="theme-toggle" aria-label="Toggle dark mode">
+            <svg class="icon icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            <svg class="icon icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></g></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <noscript>
+      <div class="alert alert-warning m-3">This editor runs entirely in your browser. Please enable JavaScript.</div>
+    </noscript>
+
+    <div class="workspace">
+      <section class="pane pane-editor" id="pane-editor" aria-label="Editor">
+        <div class="pane-pad">
+          <p class="editor-intro">
+            Edit the league data below. Each row is collapsed; click it to expand.
+            The <code>teams.json</code> on the right is generated live; copy it into
+            the repository's <code>teams.json</code> file.
+          </p>
+
+          <div id="messages" aria-live="polite"></div>
+          <div id="problems" class="problems d-none"></div>
+
+          <div class="section-head">
+            <h2>Events</h2>
+            <span id="events-count" class="section-count">0</span>
+            <button id="add-event" type="button" class="btn btn-sm btn-primary ms-auto">+ Add event</button>
+          </div>
+          <div id="events-list"></div>
+
+          <div class="section-head">
+            <h2>Teams</h2>
+            <span id="teams-count" class="section-count">0</span>
+            <button id="add-team" type="button" class="btn btn-sm btn-primary ms-auto">+ Add team</button>
+          </div>
+          <div id="teams-list"></div>
+        </div>
+      </section>
+
+      <section class="pane pane-output" aria-label="Generated teams.json">
+        <div class="output-bar">
+          <strong class="output-title">teams.json</strong>
+          <span id="output-meta" class="output-meta"></span>
+          <button id="copy-btn" type="button" class="btn btn-sm btn-primary ms-auto">
+            <span id="copy-label">Copy</span>
+          </button>
+        </div>
+        <pre id="output-code" class="output-code"></pre>
+      </section>
+    </div>
+  </div>
+
+  <script src="vendor/bootstrap.bundle.min.js" defer></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var GITHUB_URL = 'https://raw.githubusercontent.com/Flag-League/flag-league.github.io/main/teams.json';
+    var DRAFT_KEY = 'flag-league-teams-editor-draft';
+
+    function el(tag, props, children) {
+      var node = document.createElement(tag);
+      if (props) {
+        for (var k in props) {
+          if (!Object.prototype.hasOwnProperty.call(props, k)) continue;
+          var val = props[k];
+          if (val == null) continue;
+          if (k === 'class') node.className = val;
+          else if (k === 'dataset') Object.assign(node.dataset, val);
+          else if (k.indexOf('on') === 0 && typeof val === 'function') node.addEventListener(k.slice(2), val);
+          else if (k in node) { try { node[k] = val; } catch (e) { node.setAttribute(k, val); } }
+          else node.setAttribute(k, val);
+        }
+      }
+      if (children != null) {
+        var kids = Array.isArray(children) ? children : [children];
+        for (var i = 0; i < kids.length; i++) {
+          var c = kids[i];
+          if (c == null || c === false) continue;
+          node.append(c.nodeType ? c : document.createTextNode(String(c)));
+        }
+      }
+      return node;
+    }
+    function cssEscape(s) {
+      return (window.CSS && CSS.escape) ? CSS.escape(s) : String(s).replace(/[^\w-]/g, '\\$&');
+    }
+
+    var state = { events: [], teams: [] };
+    var open = new Set();
+    var uidSeq = 0;
+    function freshUid() { return 'u' + (++uidSeq); }
+    function syncUidSeq(st) {
+      var max = uidSeq, all = [], i;
+      for (i = 0; i < (st.events || []).length; i++) all.push(st.events[i].uid);
+      for (i = 0; i < (st.teams || []).length; i++) all.push(st.teams[i].uid);
+      for (i = 0; i < all.length; i++) {
+        var n = parseInt(String(all[i] || '').replace(/\D/g, ''), 10);
+        if (isFinite(n) && n > max) max = n;
+      }
+      uidSeq = max;
+    }
+
+    function num(v) { return typeof v === 'number' && isFinite(v) ? v : null; }
+    function str(v) { return v == null ? '' : String(v); }
+
+    function validateShape(data) {
+      if (!data || typeof data !== 'object') throw new Error('not a JSON object');
+      if (typeof data.events !== 'object' || data.events === null || Array.isArray(data.events))
+        throw new Error('"events" must be an object');
+      if (!Array.isArray(data.teams)) throw new Error('"teams" must be an array');
+      return data;
+    }
+
+    function fromTeamsJson(data) {
+      var events = [];
+      var byId = {};
+      Object.keys(data.events || {}).forEach(function (id) {
+        var ev = data.events[id] || {};
+        var rec = {
+          uid: freshUid(), id: String(id), name: str(ev.name),
+          startsAt: num(ev.starts_at), endsAt: num(ev.ends_at), weight: num(ev.weight)
+        };
+        events.push(rec);
+        byId[rec.id] = rec;
+      });
+      var teams = (data.teams || []).map(function (t) {
+        t = t || {};
+        var results = {};
+        var ev = t.events || {};
+        Object.keys(ev).forEach(function (eid) {
+          var ref = byId[eid];
+          if (!ref) return;
+          var r = ev[eid] || {};
+          results[ref.uid] = { score: num(r.score), place: num(r.place) };
+        });
+        return {
+          uid: freshUid(), id: str(t.id), name: str(t.name),
+          logoUrl: str(t.logo_url), web: str(t.web), description: str(t.description),
+          country: str(t.country),
+          aliases: Array.isArray(t.aliases) ? t.aliases.map(str) : [],
+          results: results
+        };
+      });
+      return { events: events, teams: teams };
+    }
+
+    function normalizeState(s) {
+      var events = (s.events || []).map(function (e) {
+        return {
+          uid: str(e.uid) || freshUid(), id: str(e.id), name: str(e.name),
+          startsAt: num(e.startsAt), endsAt: num(e.endsAt), weight: num(e.weight)
+        };
+      });
+      var teams = (s.teams || []).map(function (t) {
+        var results = {};
+        if (t.results && typeof t.results === 'object') {
+          Object.keys(t.results).forEach(function (k) {
+            var r = t.results[k] || {};
+            results[k] = { score: num(r.score), place: num(r.place) };
+          });
+        }
+        return {
+          uid: str(t.uid) || freshUid(), id: str(t.id), name: str(t.name),
+          logoUrl: str(t.logoUrl), web: str(t.web), description: str(t.description),
+          country: str(t.country),
+          aliases: Array.isArray(t.aliases) ? t.aliases.map(str) : [],
+          results: results
+        };
+      });
+      return { events: events, teams: teams };
+    }
+
+    function eventLabel(ev) { return ev.name.trim() || ev.id.trim() || 'Untitled event'; }
+    function teamLabel(t) { return t.name.trim() || t.id.trim() || 'Untitled team'; }
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function unixToUtcInput(unix) {
+      if (typeof unix !== 'number' || !isFinite(unix)) return '';
+      var d = new Date(unix * 1000);
+      return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate()) +
+        'T' + pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes());
+    }
+    function utcInputToUnix(value) {
+      var m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(value || '');
+      if (!m) return null;
+      return Math.floor(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]) / 1000);
+    }
+    function utcYear(unix) {
+      return (typeof unix === 'number' && isFinite(unix)) ? new Date(unix * 1000).getUTCFullYear() : null;
+    }
+    function seasonText(unix) {
+      var y = utcYear(unix);
+      return y ? 'Counts toward the ' + y + ' season.' : 'The calendar year of this date picks the season tab.';
+    }
+    function flagEmoji(code) {
+      if (typeof code !== 'string' || !/^[A-Za-z]{2}$/.test(code)) return '';
+      var A = 0x1f1e6, up = code.toUpperCase();
+      return String.fromCodePoint(A + up.charCodeAt(0) - 65, A + up.charCodeAt(1) - 65);
+    }
+
+    function J(s) { return JSON.stringify(s == null ? '' : String(s)); }
+    function jnum(n) { return (typeof n === 'number' && isFinite(n)) ? String(n) : '0'; }
+    // One decimal so whole-number weights match the repo style (36.0).
+    function jweight(n) {
+      if (typeof n !== 'number' || !isFinite(n)) return '0';
+      return Number.isInteger(n) ? n + '.0' : String(n);
+    }
+
+    function toJsonText(s) {
+      var L = ['{'];
+      if (s.events.length === 0) {
+        L.push('  "events": {},');
+      } else {
+        L.push('  "events": {');
+        s.events.forEach(function (ev, idx) {
+          var c = idx < s.events.length - 1 ? ',' : '';
+          L.push('    ' + J(ev.id) + ': {');
+          L.push('      "name": ' + J(ev.name) + ',');
+          L.push('      "starts_at": ' + jnum(ev.startsAt) + ',');
+          L.push('      "ends_at": ' + jnum(ev.endsAt) + ',');
+          L.push('      "weight": ' + jweight(ev.weight));
+          L.push('    }' + c);
+        });
+        L.push('  },');
+      }
+      if (s.teams.length === 0) {
+        L.push('  "teams": []');
+      } else {
+        L.push('  "teams": [');
+        s.teams.forEach(function (t, ti) {
+          var tc = ti < s.teams.length - 1 ? ',' : '';
+          L.push('    {');
+          var props = [];
+          props.push('      "id": ' + J(t.id));
+          props.push('      "name": ' + J(t.name));
+          if (t.logoUrl && t.logoUrl.trim()) props.push('      "logo_url": ' + J(t.logoUrl.trim()));
+          if (t.web && t.web.trim()) props.push('      "web": ' + J(t.web.trim()));
+          if (t.description && t.description.trim()) props.push('      "description": ' + J(t.description.trim()));
+          props.push('      "country": ' + J(t.country));
+          var aliases = t.aliases.map(function (a) { return a.trim(); }).filter(Boolean);
+          if (aliases.length) props.push('      "aliases": [' + aliases.map(J).join(', ') + ']');
+          var refs = s.events.filter(function (ev) { return t.results[ev.uid]; });
+          if (refs.length === 0) {
+            props.push('      "events": {}');
+          } else {
+            var inner = refs.map(function (ev, ei) {
+              var r = t.results[ev.uid];
+              var c = ei < refs.length - 1 ? ',' : '';
+              return '        ' + J(ev.id) + ': { "score": ' + jnum(r.score) + ', "place": ' + jnum(r.place) + ' }' + c;
+            });
+            props.push('      "events": {\n' + inner.join('\n') + '\n      }');
+          }
+          L.push(props.join(',\n'));
+          L.push('    }' + tc);
+        });
+        L.push('  ]');
+      }
+      L.push('}');
+      return L.join('\n') + '\n';
+    }
+
+    function countValues(arr) {
+      var m = {};
+      arr.forEach(function (x) { m[x] = (m[x] || 0) + 1; });
+      return m;
+    }
+    function validate(s) {
+      var errors = new Map(), warnings = new Map(), list = [];
+      function addErr(fk, where, msg) {
+        errors.set(fk, msg);
+        list.push({ level: 'error', where: where, message: msg, fieldKey: fk });
+      }
+      function addWarn(fk, where, msg) {
+        warnings.set(fk, msg);
+        list.push({ level: 'warning', where: where, message: msg, fieldKey: fk });
+      }
+
+      var evIdCounts = countValues(s.events.map(function (e) { return e.id.trim(); }).filter(Boolean));
+      s.events.forEach(function (ev) {
+        var where = 'Event · ' + eventLabel(ev);
+        var k = function (f) { return 'event:' + ev.uid + ':' + f; };
+        var id = ev.id.trim();
+        if (!id) addErr(k('id'), where, 'Event id is required.');
+        else if (evIdCounts[id] > 1) addErr(k('id'), where, 'Duplicate event id "' + id + '".');
+        else if (!/^[a-z0-9-]+$/.test(id)) addWarn(k('id'), where, 'Event id appears in URLs; lowercase letters, digits and hyphens are recommended.');
+        if (!ev.name.trim()) addErr(k('name'), where, 'Name is required.');
+        if (ev.startsAt == null || !isFinite(ev.startsAt)) addErr(k('startsAt'), where, 'Start time is required.');
+        if (ev.endsAt == null || !isFinite(ev.endsAt)) addErr(k('endsAt'), where, 'End time is required.');
+        if (ev.weight == null || !isFinite(ev.weight)) addErr(k('weight'), where, 'Weight is required.');
+        else if (ev.weight < 0) addErr(k('weight'), where, 'Weight must be 0 or greater.');
+        if (ev.startsAt != null && isFinite(ev.startsAt) && ev.endsAt != null && isFinite(ev.endsAt) && ev.endsAt < ev.startsAt)
+          addWarn(k('endsAt'), where, 'End time is before the start time.');
+      });
+
+      var teamIdCounts = countValues(s.teams.map(function (t) { return t.id.trim(); }).filter(Boolean));
+      s.teams.forEach(function (t) {
+        var where = 'Team · ' + teamLabel(t);
+        var k = function (f) { return 'team:' + t.uid + ':' + f; };
+        var id = t.id.trim();
+        if (!id) addErr(k('id'), where, 'Team id is required.');
+        else if (!/^[a-z0-9-]+$/.test(id)) addErr(k('id'), where, 'Team id may only contain lowercase letters, digits and hyphens.');
+        else if (teamIdCounts[id] > 1) addErr(k('id'), where, 'Duplicate team id "' + id + '".');
+        if (!t.name.trim()) addErr(k('name'), where, 'Name is required.');
+        var c = t.country.trim();
+        if (!c) addErr(k('country'), where, 'Country is required.');
+        else if (!/^[A-Za-z]{2}$/.test(c)) addErr(k('country'), where, 'Country must be a 2-letter ISO 3166-1 code.');
+      });
+
+      s.events.forEach(function (ev) {
+        var where = 'Event · ' + eventLabel(ev);
+        s.teams.forEach(function (t) {
+          var r = t.results[ev.uid];
+          if (!r) return;
+          var who = teamLabel(t);
+          var rk = function (f) { return 'result:' + t.uid + ':' + ev.uid + ':' + f; };
+          if (r.score == null || !isFinite(r.score)) addErr(rk('score'), where, who + ': score is required.');
+          else if (r.score < 0) addErr(rk('score'), where, who + ': score must be 0 or greater.');
+          if (r.place == null || !isFinite(r.place)) addErr(rk('place'), where, who + ': place is required.');
+          else if (!Number.isInteger(r.place) || r.place < 1) addErr(rk('place'), where, who + ': place must be a whole number ≥ 1.');
+        });
+      });
+      return { errors: errors, warnings: warnings, list: list };
+    }
+
+    function cardOf(fk) {
+      var p = fk.split(':');
+      if (p[0] === 'event' || p[0] === 'team') return p[1];
+      if (p[0] === 'result') return p[2];
+      if (p[0] === 'rteam') return p[1];
+      return null;
+    }
+
+    var paneEditor = document.getElementById('pane-editor');
+    var eventsList = document.getElementById('events-list');
+    var teamsList = document.getElementById('teams-list');
+    var eventsCountEl = document.getElementById('events-count');
+    var teamsCountEl = document.getElementById('teams-count');
+    var countsEl = document.getElementById('counts');
+    var badgeEl = document.getElementById('validity-badge');
+    var problemsEl = document.getElementById('problems');
+    var messages = document.getElementById('messages');
+    var outputCode = document.getElementById('output-code');
+    var outputMeta = document.getElementById('output-meta');
+    var copyBtn = document.getElementById('copy-btn');
+    var copyLabel = document.getElementById('copy-label');
+    var btnGithub = document.getElementById('btn-github');
+
+    function textInput(fkey, value, oninput, attrs) {
+      var props = { 'class': 'form-control form-control-sm', type: 'text', value: value == null ? '' : value };
+      if (attrs) for (var a in attrs) props[a] = attrs[a];
+      var inp = el('input', props);
+      inp.dataset.fkey = fkey;
+      inp.addEventListener('input', function () { oninput(inp.value); });
+      return inp;
+    }
+    function numInput(fkey, value, oninput, attrs) {
+      var props = {
+        'class': 'form-control form-control-sm', type: 'number',
+        value: (typeof value === 'number' && isFinite(value)) ? String(value) : ''
+      };
+      if (attrs) for (var a in attrs) props[a] = attrs[a];
+      var inp = el('input', props);
+      inp.dataset.fkey = fkey;
+      inp.addEventListener('input', function () {
+        if (inp.value === '') { oninput(null); return; }
+        var n = Number(inp.value);
+        oninput(isNaN(n) ? null : n);
+      });
+      return inp;
+    }
+    function dtInput(fkey, unix, oninput) {
+      var inp = el('input', {
+        'class': 'form-control form-control-sm', type: 'datetime-local',
+        min: '1970-01-01T00:00'
+      });
+      inp.value = unixToUtcInput(unix);
+      inp.dataset.fkey = fkey;
+      inp.addEventListener('input', function () { oninput(utcInputToUnix(inp.value)); });
+      return inp;
+    }
+    function fieldWrap(labelText, control, opts) {
+      opts = opts || {};
+      var kids = [
+        el('label', { 'class': 'form-label' }, labelText),
+        control,
+        el('div', { 'class': 'field-msg d-none' })
+      ];
+      if (opts.hint) {
+        kids.push(typeof opts.hint === 'string' ? el('div', { 'class': 'field-hint' }, opts.hint) : opts.hint);
+      }
+      var col = el('div', { 'class': opts.col || 'col-12' }, kids);
+      col.setAttribute('data-field-wrap', '');
+      return col;
+    }
+    function iconButton(title, onClick) {
+      var btn = el('button', { 'class': 'icon-btn', type: 'button', title: title, 'aria-label': title });
+      btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>';
+      btn.addEventListener('click', onClick);
+      return btn;
+    }
+
+    function toggleCard(uid) {
+      if (open.has(uid)) open.delete(uid); else open.add(uid);
+      rebuild();
+    }
+    function summaryRow(uid, deleteTitle, onDelete) {
+      var isOpen = open.has(uid);
+      var chevron = el('span', { 'class': 'chevron' });
+      chevron.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
+      var title = el('span', { 'class': 'entry-title', dataset: { uid: uid } });
+      var sub = el('span', { 'class': 'entry-sub', dataset: { uid: uid } });
+      var badge = el('span', { 'class': 'entry-badge d-none', dataset: { uid: uid } });
+      var btn = el('div', {
+        'class': 'entry-summary-btn', role: 'button', tabindex: '0',
+        'aria-expanded': isOpen ? 'true' : 'false'
+      }, [chevron, el('div', { 'class': 'entry-summary-main' }, [title, sub]), badge]);
+      btn.dataset.fkey = 'summary:' + uid;
+      btn.addEventListener('click', function () { toggleCard(uid); });
+      btn.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCard(uid); }
+      });
+      return el('div', { 'class': 'entry-summary' }, [btn, iconButton(deleteTitle, onDelete)]);
+    }
+
+    function eventCard(ev) {
+      var card = el('div', { 'class': 'entry-card card', 'data-card': ev.uid });
+      card.append(summaryRow(ev.uid, 'Delete event', function () { deleteEvent(ev); }));
+      if (open.has(ev.uid)) {
+        card.append(el('div', { 'class': 'entry-detail' }, eventDetail(ev)));
+      }
+      return card;
+    }
+
+    function eventDetail(ev) {
+      var idIn = textInput('event:' + ev.uid + ':id', ev.id, function (v) { ev.id = v; refresh(); },
+        { placeholder: 'faust2026' });
+      var nameIn = textInput('event:' + ev.uid + ':name', ev.name, function (v) { ev.name = v; refresh(); },
+        { placeholder: 'FAUST CTF 2026' });
+      var weightIn = numInput('event:' + ev.uid + ':weight', ev.weight, function (v) { ev.weight = v; refresh(); },
+        { min: '0', step: 'any', placeholder: '24.5' });
+      var startIn = dtInput('event:' + ev.uid + ':startsAt', ev.startsAt, function (v) { ev.startsAt = v; refresh(); });
+      var seasonHint = el('div', { 'class': 'field-hint' }, seasonText(ev.endsAt));
+      var endIn = dtInput('event:' + ev.uid + ':endsAt', ev.endsAt, function (v) {
+        ev.endsAt = v; seasonHint.textContent = seasonText(v); refresh();
+      });
+      var grid = el('div', { 'class': 'row g-3' }, [
+        fieldWrap('Event id', idIn, { col: 'col-sm-4', hint: 'Used in URLs, keep it stable.' }),
+        fieldWrap('Name', nameIn, { col: 'col-sm-5' }),
+        fieldWrap('Weight', weightIn, { col: 'col-sm-3', hint: 'CTFtime-style.' }),
+        fieldWrap('Starts (UTC)', startIn, { col: 'col-sm-6' }),
+        fieldWrap('Ends (UTC)', endIn, { col: 'col-sm-6', hint: seasonHint })
+      ]);
+      return [grid, resultsSection(ev)];
+    }
+
+    function resultsSection(ev) {
+      var panel = el('div', { 'class': 'results-panel' });
+      panel.append(el('div', { 'class': 'results-panel-head' }, 'Results'));
+      var withResult = state.teams.filter(function (t) { return t.results[ev.uid]; });
+      if (!withResult.length) {
+        panel.append(el('div', { 'class': 'results-empty' },
+          state.teams.length
+            ? 'No results yet. Add the teams that played this event.'
+            : 'Add teams first, then record their results here.'));
+      }
+      withResult.forEach(function (t) { panel.append(resultRow(ev, t)); });
+
+      var taken = {};
+      withResult.forEach(function (t) { taken[t.uid] = true; });
+      var available = state.teams.filter(function (t) { return !taken[t.uid]; });
+      var addBtn = el('button', { 'class': 'btn btn-sm btn-outline-secondary', type: 'button' }, '+ Add result');
+      if (!available.length) {
+        addBtn.disabled = true;
+        addBtn.title = state.teams.length
+          ? 'Every team already has a result for this event.'
+          : 'Add teams first.';
+      } else {
+        addBtn.addEventListener('click', function () {
+          var t = available[0];
+          t.results[ev.uid] = { score: null, place: null };
+          rebuild('result:' + t.uid + ':' + ev.uid + ':score');
+        });
+      }
+      panel.append(addBtn);
+      return panel;
+    }
+
+    function resultRow(ev, t) {
+      var r = t.results[ev.uid];
+      var sel = el('select', { 'class': 'form-select form-select-sm' });
+      sel.dataset.fkey = 'rteam:' + ev.uid + ':' + t.uid;
+      state.teams.forEach(function (x) {
+        if (x !== t && x.results[ev.uid]) return;
+        sel.append(el('option', { value: x.uid, selected: x === t }, teamLabel(x)));
+      });
+      sel.value = t.uid;
+      sel.addEventListener('change', function () {
+        var target = null;
+        for (var i = 0; i < state.teams.length; i++) {
+          if (state.teams[i].uid === sel.value) { target = state.teams[i]; break; }
+        }
+        if (!target || target === t) return;
+        target.results[ev.uid] = r;
+        delete t.results[ev.uid];
+        rebuild('result:' + target.uid + ':' + ev.uid + ':score');
+      });
+
+      var scoreIn = numInput('result:' + t.uid + ':' + ev.uid + ':score', r.score,
+        function (v) { r.score = v; refresh(); }, { min: '0', step: 'any' });
+      var placeIn = numInput('result:' + t.uid + ':' + ev.uid + ':place', r.place,
+        function (v) { r.place = v; refresh(); }, { min: '1', step: '1' });
+      placeIn.classList.add('result-place');
+
+      return el('div', { 'class': 'result-row' }, [
+        el('div', { 'class': 'mini-field result-team-field' }, [el('span', { 'class': 'mini-label' }, 'Team'), sel]),
+        el('div', { 'class': 'mini-field' }, [el('span', { 'class': 'mini-label' }, 'Score'), scoreIn]),
+        el('div', { 'class': 'mini-field' }, [el('span', { 'class': 'mini-label' }, 'Place'), placeIn]),
+        iconButton('Remove result', function () { delete t.results[ev.uid]; rebuild(); })
+      ]);
+    }
+
+    function teamCard(t) {
+      var card = el('div', { 'class': 'entry-card card', 'data-card': t.uid });
+      card.append(summaryRow(t.uid, 'Delete team', function () { deleteTeam(t); }));
+      if (open.has(t.uid)) {
+        card.append(el('div', { 'class': 'entry-detail' }, teamDetail(t)));
+      }
+      return card;
+    }
+
+    function teamDetail(t) {
+      var idIn = textInput('team:' + t.uid + ':id', t.id, function (v) { t.id = v; refresh(); },
+        { placeholder: 'team-id' });
+      var nameIn = textInput('team:' + t.uid + ':name', t.name, function (v) { t.name = v; refresh(); },
+        { placeholder: 'Team Name' });
+      var flag = el('span', { 'class': 'flag-preview' }, flagEmoji(t.country) || '🏳️');
+      var countryIn = textInput('team:' + t.uid + ':country', t.country, function (v) {
+        t.country = v;
+        flag.textContent = flagEmoji(v) || '🏳️';
+        refresh();
+      }, { placeholder: 'DE', maxlength: '2', autocomplete: 'off' });
+      var logoIn = textInput('team:' + t.uid + ':logoUrl', t.logoUrl, function (v) { t.logoUrl = v; refresh(); },
+        { type: 'url', placeholder: 'https://.../favicon.png' });
+      var webIn = textInput('team:' + t.uid + ':web', t.web, function (v) { t.web = v; refresh(); },
+        { type: 'url', placeholder: 'https://...' });
+      var descIn = textInput('team:' + t.uid + ':description', t.description, function (v) {
+        t.description = v; refresh();
+      }, { placeholder: 'Short one-line description.' });
+      var aliasesTa = el('textarea', {
+        'class': 'form-control form-control-sm', rows: '2', placeholder: 'One alias per line'
+      });
+      aliasesTa.value = t.aliases.join('\n');
+      aliasesTa.dataset.fkey = 'team:' + t.uid + ':aliases';
+      aliasesTa.addEventListener('input', function () { t.aliases = aliasesTa.value.split('\n'); refresh(); });
+
+      return el('div', { 'class': 'row g-3' }, [
+        fieldWrap('Team id', idIn, { col: 'col-sm-4', hint: 'Used in URLs, keep it stable.' }),
+        fieldWrap('Name', nameIn, { col: 'col-sm-5' }),
+        fieldWrap('Country', el('div', { 'class': 'country-field' }, [countryIn, flag]),
+          { col: 'col-sm-3', hint: 'ISO 3166-1 alpha-2.' }),
+        fieldWrap('Logo URL', logoIn, { col: 'col-md-6', hint: 'Optional. Absolute URL to a PNG.' }),
+        fieldWrap('Website', webIn, { col: 'col-md-6', hint: 'Optional.' }),
+        fieldWrap('Description', descIn, { col: 'col-12', hint: 'Optional. Shown on the Teams page.' }),
+        fieldWrap('Aliases', aliasesTa, { col: 'col-12', hint: 'Optional. Other names this team is known by.' })
+      ]);
+    }
+
+    function emptyState(text) { return el('div', { 'class': 'empty-state' }, text); }
+
+    function renderEvents() {
+      if (state.events.length) {
+        eventsList.replaceChildren.apply(eventsList, state.events.map(eventCard));
+      } else {
+        eventsList.replaceChildren(emptyState('No events yet. Add the CTFs that teams competed in.'));
+      }
+    }
+    function renderTeams() {
+      if (state.teams.length) {
+        teamsList.replaceChildren.apply(teamsList, state.teams.map(teamCard));
+      } else {
+        teamsList.replaceChildren(emptyState('No teams yet. Add the teams competing in the league.'));
+      }
+    }
+    function renderOutput() {
+      var text = toJsonText(state);
+      outputCode.textContent = text;
+      outputMeta.textContent = text.length.toLocaleString('en-US') + ' characters';
+    }
+
+    function captureFocus() {
+      var a = document.activeElement;
+      if (!a || !a.dataset || !a.dataset.fkey) return null;
+      var sel = null;
+      try { sel = { s: a.selectionStart, e: a.selectionEnd }; } catch (e) {}
+      return { fkey: a.dataset.fkey, sel: sel };
+    }
+    function restoreFocus(snap, scroll) {
+      if (!snap) return;
+      var inp = paneEditor.querySelector('[data-fkey="' + cssEscape(snap.fkey) + '"]');
+      if (!inp) return;
+      try { inp.focus({ preventScroll: !scroll }); } catch (e) { inp.focus(); }
+      if (snap.sel) { try { inp.setSelectionRange(snap.sel.s, snap.sel.e); } catch (e) {} }
+      if (scroll) {
+        var card = inp.closest('.entry-card');
+        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function rebuild(focusKey) {
+      var snap = focusKey ? { fkey: focusKey, sel: null } : captureFocus();
+      renderEvents();
+      renderTeams();
+      renderOutput();
+      applyValidation(validate(state));
+      scheduleAutosave();
+      restoreFocus(snap, !!focusKey);
+    }
+
+    function refresh() {
+      renderOutput();
+      applyValidation(validate(state));
+      scheduleAutosave();
+    }
+
+    function setSummary(uid, title, muted, sub, prob) {
+      var t = paneEditor.querySelector('.entry-title[data-uid="' + uid + '"]');
+      var s = paneEditor.querySelector('.entry-sub[data-uid="' + uid + '"]');
+      var b = paneEditor.querySelector('.entry-badge[data-uid="' + uid + '"]');
+      if (t) { t.textContent = title; t.classList.toggle('muted-title', !!muted); }
+      if (s) s.textContent = sub;
+      if (b) {
+        if (prob && (prob.err || prob.warn) && !open.has(uid)) {
+          if (prob.err) { b.textContent = prob.err + (prob.err > 1 ? ' problems' : ' problem'); b.className = 'entry-badge bad'; }
+          else { b.textContent = prob.warn + (prob.warn > 1 ? ' warnings' : ' warning'); b.className = 'entry-badge warn'; }
+        } else {
+          b.className = 'entry-badge d-none';
+        }
+      }
+    }
+
+    function fillEventSummary(ev, prob) {
+      var name = ev.name.trim(), id = ev.id.trim();
+      var sub = [];
+      if (name && id) sub.push(id);
+      var y = utcYear(ev.endsAt);
+      if (y) sub.push(y + ' season');
+      if (ev.weight != null && isFinite(ev.weight)) sub.push('weight ' + ev.weight);
+      var rc = state.teams.filter(function (t) { return t.results[ev.uid]; }).length;
+      sub.push(rc + (rc === 1 ? ' team' : ' teams'));
+      setSummary(ev.uid, name || id || 'Untitled event', !name && !id, sub.join(' · '), prob);
+    }
+    function fillTeamSummary(t, prob) {
+      var name = t.name.trim(), id = t.id.trim();
+      var sub = [];
+      if (name && id) sub.push(id);
+      var fe = flagEmoji(t.country);
+      if (fe) sub.push(fe + ' ' + t.country.trim().toUpperCase());
+      else if (t.country.trim()) sub.push(t.country.trim());
+      var ep = state.events.filter(function (e) { return t.results[e.uid]; }).length;
+      sub.push(ep + (ep === 1 ? ' event' : ' events'));
+      setSummary(t.uid, name || id || 'Untitled team', !name && !id, sub.join(' · '), prob);
+    }
+
+    function applyValidation(v) {
+      var errc = 0, warnc = 0;
+      v.list.forEach(function (p) { if (p.level === 'error') errc++; else warnc++; });
+
+      badgeEl.classList.remove('ok', 'bad', 'warn');
+      if (errc > 0) {
+        badgeEl.classList.add('bad');
+        badgeEl.textContent = '✗ ' + errc + ' problem' + (errc > 1 ? 's' : '');
+      } else if (warnc > 0) {
+        badgeEl.classList.add('warn');
+        badgeEl.textContent = '✓ Valid · ' + warnc + ' warning' + (warnc > 1 ? 's' : '');
+      } else {
+        badgeEl.classList.add('ok');
+        badgeEl.textContent = '✓ Valid';
+      }
+
+      eventsCountEl.textContent = state.events.length;
+      teamsCountEl.textContent = state.teams.length;
+      countsEl.textContent = state.events.length + ' event' + (state.events.length === 1 ? '' : 's') +
+        ' · ' + state.teams.length + ' team' + (state.teams.length === 1 ? '' : 's');
+
+      var cardProblems = {};
+      v.list.forEach(function (p) {
+        var uid = cardOf(p.fieldKey);
+        if (!uid) return;
+        var c = cardProblems[uid] || (cardProblems[uid] = { err: 0, warn: 0 });
+        if (p.level === 'error') c.err++; else c.warn++;
+      });
+      state.events.forEach(function (ev) { fillEventSummary(ev, cardProblems[ev.uid]); });
+      state.teams.forEach(function (t) { fillTeamSummary(t, cardProblems[t.uid]); });
+
+      paneEditor.querySelectorAll('[data-fkey]').forEach(function (inp) {
+        var fk = inp.dataset.fkey;
+        if (fk.indexOf('summary:') === 0) return;
+        var isErr = v.errors.has(fk);
+        var isWarn = !isErr && v.warnings.has(fk);
+        inp.classList.toggle('is-invalid', isErr);
+        inp.classList.toggle('is-warning', isWarn);
+        var msg = v.errors.get(fk) || v.warnings.get(fk) || '';
+        var wrap = inp.closest('[data-field-wrap]');
+        if (wrap) {
+          var m = wrap.querySelector('.field-msg');
+          if (m) {
+            m.textContent = msg;
+            m.className = 'field-msg ' + (isErr ? 'field-msg-error' : isWarn ? 'field-msg-warn' : 'd-none');
+          }
+        } else if (msg) {
+          inp.title = msg;
+        } else {
+          inp.removeAttribute('title');
+        }
+      });
+
+      renderProblems(v);
+    }
+
+    function focusField(fk) {
+      var uid = cardOf(fk);
+      if (uid && !open.has(uid)) { open.add(uid); rebuild(); }
+      var inp = paneEditor.querySelector('[data-fkey="' + cssEscape(fk) + '"]');
+      if (!inp) return;
+      var card = inp.closest('.entry-card');
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      try { inp.focus({ preventScroll: true }); } catch (e) { inp.focus(); }
+    }
+
+    function renderProblems(v) {
+      if (!v.list.length) {
+        problemsEl.classList.add('d-none');
+        problemsEl.replaceChildren();
+        return;
+      }
+      problemsEl.classList.remove('d-none');
+      var errc = v.list.filter(function (p) { return p.level === 'error'; }).length;
+      var warnc = v.list.length - errc;
+      var parts = [];
+      if (errc) parts.push(errc + ' problem' + (errc > 1 ? 's' : ''));
+      if (warnc) parts.push(warnc + ' warning' + (warnc > 1 ? 's' : ''));
+      var head = el('div', { 'class': 'problems-head' }, parts.join(' · ') + ' to fix');
+      var items = v.list.map(function (p) {
+        var item = el('div', { 'class': 'problem level-' + p.level }, [
+          el('span', { 'class': 'problem-dot' }, p.level === 'error' ? '●' : '▲'),
+          el('span', { 'class': 'problem-where' }, p.where + ':'),
+          el('span', { 'class': 'problem-msg' }, p.message)
+        ]);
+        item.addEventListener('click', function () { focusField(p.fieldKey); });
+        return item;
+      });
+      problemsEl.replaceChildren(head, el('div', { 'class': 'problems-list' }, items));
+    }
+
+    function eventHasData(ev) {
+      var used = state.teams.some(function (t) { return t.results[ev.uid]; });
+      return !!(ev.id || ev.name || ev.startsAt != null || ev.endsAt != null || ev.weight != null || used);
+    }
+    function teamHasData(t) {
+      return !!(t.id || t.name || t.logoUrl || t.web || t.description || t.country ||
+        t.aliases.some(function (a) { return a.trim(); }) || Object.keys(t.results).length);
+    }
+    function deleteEvent(ev) {
+      if (eventHasData(ev) &&
+        !window.confirm('Delete this event? Results referencing it will be removed from every team.')) return;
+      open.delete(ev.uid);
+      state.events = state.events.filter(function (e) { return e !== ev; });
+      state.teams.forEach(function (t) { delete t.results[ev.uid]; });
+      rebuild();
+    }
+    function deleteTeam(t) {
+      if (teamHasData(t) && !window.confirm('Delete this team? Its results will be removed too.')) return;
+      open.delete(t.uid);
+      state.teams = state.teams.filter(function (x) { return x !== t; });
+      rebuild();
+    }
+
+    var autosaveTimer = null;
+    function scheduleAutosave() {
+      clearTimeout(autosaveTimer);
+      autosaveTimer = setTimeout(function () {
+        try {
+          localStorage.setItem(DRAFT_KEY, JSON.stringify({ savedAt: Date.now(), state: state }));
+        } catch (e) {}
+      }, 500);
+    }
+    function readDraft() {
+      try {
+        var raw = localStorage.getItem(DRAFT_KEY);
+        if (!raw) return null;
+        var d = JSON.parse(raw);
+        if (!d || !d.state || !Array.isArray(d.state.events) || !Array.isArray(d.state.teams)) return null;
+        return d;
+      } catch (e) { return null; }
+    }
+
+    function showMessage(type, text) {
+      var cls = { success: 'alert-success', error: 'alert-danger', warning: 'alert-warning', info: 'alert-info' }[type] || 'alert-secondary';
+      var closeBtn = el('button', { 'class': 'btn-close', type: 'button', 'aria-label': 'Dismiss' });
+      var al = el('div', {
+        'class': 'alert ' + cls + ' alert-dismissible d-flex align-items-center gap-2', role: 'alert'
+      }, [el('span', { 'class': 'flex-grow-1' }, text), closeBtn]);
+      closeBtn.addEventListener('click', function () { al.remove(); });
+      messages.append(al);
+      if (type === 'success' || type === 'info') setTimeout(function () { al.remove(); }, 4500);
+    }
+    function dismissDraftBanner() {
+      var b = messages.querySelector('[data-role="draft-banner"]');
+      if (b) b.remove();
+    }
+    function showDraftBanner(savedAt) {
+      dismissDraftBanner();
+      var when = '';
+      try { when = new Date(savedAt).toLocaleString(); } catch (e) {}
+      var loadBtn = el('button', { 'class': 'btn btn-sm btn-outline-secondary', type: 'button' },
+        'Load from GitHub');
+      loadBtn.addEventListener('click', function () { loadFromGitHub({}); });
+      var closeBtn = el('button', { 'class': 'btn-close', type: 'button', 'aria-label': 'Dismiss' });
+      var banner = el('div', {
+        'class': 'alert alert-info alert-dismissible d-flex flex-wrap align-items-center gap-2'
+      }, [
+        el('span', { 'class': 'flex-grow-1' },
+          'Restored your unsaved draft' + (when ? ' from ' + when : '') + '.'),
+        loadBtn, closeBtn
+      ]);
+      banner.setAttribute('data-role', 'draft-banner');
+      closeBtn.addEventListener('click', function () { banner.remove(); });
+      messages.prepend(banner);
+    }
+
+    // teams.json on GitHub is the only source; the working copy lives in localStorage.
+    function setBusy(b) { btnGithub.disabled = b; }
+    function loadFromGitHub(opts) {
+      opts = opts || {};
+      if (opts.confirmReplace && !window.confirm(opts.confirmReplace)) return Promise.resolve();
+      setBusy(true);
+      return fetch(GITHUB_URL, { cache: 'no-cache' }).then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json().catch(function () { throw new Error('the response is not valid JSON'); });
+      }).then(function (data) {
+        state = fromTeamsJson(validateShape(data));
+        open.clear();
+        rebuild();
+        dismissDraftBanner();
+        if (!opts.initial) showMessage('success', 'Loaded the latest teams.json from GitHub.');
+      }).catch(function (e) {
+        var msg = 'Could not load teams.json from GitHub: ' + e.message + '.';
+        if (opts.initial) msg += ' Check your connection, or start from this empty file.';
+        showMessage(opts.initial ? 'warning' : 'error', msg);
+      }).then(function () { setBusy(false); });
+    }
+
+    function copyOutput() {
+      var text = outputCode.textContent;
+      var done = function (ok) {
+        copyLabel.textContent = ok ? 'Copied!' : 'Copy failed';
+        copyBtn.classList.toggle('copied', ok);
+        clearTimeout(copyOutput._t);
+        copyOutput._t = setTimeout(function () {
+          copyLabel.textContent = 'Copy';
+          copyBtn.classList.remove('copied');
+        }, 1800);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(fallbackCopy(text)); });
+      } else {
+        done(fallbackCopy(text));
+      }
+    }
+    function fallbackCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.top = '-1000px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        ta.remove();
+        return ok;
+      } catch (e) { return false; }
+    }
+
+    document.getElementById('add-event').addEventListener('click', function () {
+      var uid = freshUid();
+      state.events.push({ uid: uid, id: '', name: '', startsAt: null, endsAt: null, weight: null });
+      open.add(uid);
+      rebuild('event:' + uid + ':id');
+    });
+    document.getElementById('add-team').addEventListener('click', function () {
+      var uid = freshUid();
+      state.teams.push({
+        uid: uid, id: '', name: '', logoUrl: '', web: '', description: '',
+        country: '', aliases: [], results: {}
+      });
+      open.add(uid);
+      rebuild('team:' + uid + ':id');
+    });
+    btnGithub.addEventListener('click', function () {
+      loadFromGitHub({
+        confirmReplace: 'Load the latest teams.json from GitHub? This replaces the current editor contents.'
+      });
+    });
+    copyBtn.addEventListener('click', copyOutput);
+    document.getElementById('theme-toggle').addEventListener('click', function () {
+      var root = document.documentElement;
+      var next = root.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-bs-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+    });
+
+    (function init() {
+      var draft = readDraft();
+      if (draft) {
+        syncUidSeq(draft.state);
+        state = normalizeState(draft.state);
+        rebuild();
+        showDraftBanner(draft.savedAt);
+      } else {
+        state = { events: [], teams: [] };
+        rebuild();
+        loadFromGitHub({ initial: true });
+      }
+    })();
+  })();
+  </script>
+</body>
+</html>

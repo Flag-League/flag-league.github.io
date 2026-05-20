@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Human Flag League</title>
+  <title>Team - Human Flag League</title>
   <meta name="description" content="CTF League without Clankers. Made by humans, made for humans.">
 
   <link rel="icon" type="image/svg+xml" href="ctf-league.svg">
 
-  <meta property="og:title" content="Human Flag League">
+  <meta property="og:title" content="Team - Human Flag League">
   <meta property="og:description" content="CTF League without Clankers. Made by humans, made for humans.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://flag-league.github.io/">
+  <meta property="og:url" content="https://flag-league.github.io/team.html">
   <meta property="og:image" content="https://flag-league.github.io/og-image.png">
   <meta name="twitter:card" content="summary">
 
@@ -31,7 +31,7 @@
       </button>
       <div class="collapse navbar-collapse" id="nav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.html">Scoreboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html">Scoreboard</a></li>
           <li class="nav-item"><a class="nav-link" href="teams.html">Teams</a></li>
           <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
         </ul>
@@ -40,26 +40,13 @@
   </nav>
 
   <main class="container py-4">
-    <h1 class="mb-1">Stop the slopping in CTFs.</h1>
-    <p class="hero-tagline mb-4">This CTF league is an attempt to make playing CTFs fun again.<br/>We follow a strict non-AI policy and don't care about Clankers and their teams.</p>
-
+    <p class="mb-3"><a href="teams.html" class="back-link">&larr; Teams</a></p>
     <noscript>
-      <div class="alert alert-warning">This site is built in your browser. Please enable JavaScript.</div>
+      <div class="alert alert-warning">Team pages are built in your browser. Please enable JavaScript.</div>
     </noscript>
-
-    <div class="row g-4">
-      <div class="col-lg-8">
-        <h2 class="h4 mb-3">Scoreboard</h2>
-        <ul class="nav nav-tabs" id="year-tabs" role="tablist"></ul>
-        <div class="tab-content pt-3" id="year-panes" aria-busy="true">
-          <div class="text-center text-secondary py-5">
-            <div class="spinner-border" role="status"><span class="visually-hidden">Loading</span></div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4">
-        <h2 class="h4 mb-3">Events</h2>
-        <div id="events-sidebar"></div>
+    <div id="content" aria-busy="true" aria-live="polite">
+      <div class="text-center text-secondary py-5">
+        <div class="spinner-border" role="status"><span class="visually-hidden">Loading</span></div>
       </div>
     </div>
   </main>
@@ -75,6 +62,6 @@
 
   <script src="vendor/bootstrap.bundle.min.js" defer></script>
   <script type="module" src="js/theme.js"></script>
-  <script type="module" src="js/page-scoreboard.js"></script>
+  <script type="module" src="js/page-team.js"></script>
 </body>
 </html>

@@ -1,0 +1,202 @@
+/* Theme and polish on top of Bootstrap. */
+
+:root {
+  --brand: #363e96;
+  --brand-hover: #2c3380;
+  --bs-body-font-size: 0.95rem;
+}
+
+a { text-decoration: none; }
+code { color: inherit; }
+
+:root,
+[data-bs-theme="light"] {
+  --bs-primary: #363e96;
+  --bs-primary-rgb: 54, 62, 150;
+  --bs-link-color: #363e96;
+  --bs-link-color-rgb: 54, 62, 150;
+  --bs-link-hover-color: #2c3380;
+  --bs-link-hover-color-rgb: 44, 51, 128;
+}
+
+[data-bs-theme="dark"] {
+  --brand: #2f80ff;
+  --brand-hover: #5398ff;
+  --bs-primary: #2f80ff;
+  --bs-primary-rgb: 47, 128, 255;
+  --bs-link-color: #5398ff;
+  --bs-link-color-rgb: 83, 152, 255;
+  --bs-link-hover-color: #7db0ff;
+  --bs-link-hover-color-rgb: 125, 176, 255;
+  --bs-body-bg: #000000;
+  --bs-body-color: #e9e9e9;
+  --bs-secondary-color: rgba(235, 235, 235, 0.82);
+  --bs-tertiary-bg: #141417;
+  --bs-border-color: #2c2c30;
+  --bs-emphasis-color: #ffffff;
+  --bs-secondary-rgb: 190, 190,190;
+
+}
+
+/* Sticky footer. */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+body > main { flex: 1 0 auto; }
+
+h1, .h1 { font-size: 1.9rem; }
+h2, .h2 { font-size: 1.5rem; }
+h3, .h3 { font-size: 1.3rem; }
+h4, .h4 { font-size: 1.1rem; }
+h5, .h5 { font-size: 1rem; }
+.lead { font-size:0.9rem; font-weight: 400; }
+
+.hero-tagline {
+  max-width: 46rem;
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--bs-secondary-color);
+}
+
+.back-link {
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: var(--bs-secondary-color);
+}
+.back-link:hover { color: var(--brand); }
+
+/* Navbar. */
+.site-navbar { background-color: #f8f9fa; }
+[data-bs-theme="dark"] .site-navbar { background-color: #000000; }
+
+.navbar-brand {
+  color: var(--brand);
+  font-weight: 700;
+}
+.navbar-brand:hover { color: var(--brand); }
+[data-bs-theme="dark"] .navbar-brand,
+[data-bs-theme="dark"] .navbar-brand:hover { color: #f1f1f1; }
+
+/* Theme toggle: a bare moon/sun icon. */
+.theme-toggle {
+  background: none;
+  border: 0;
+  padding: 0.25rem;
+  line-height: 0;
+  color: var(--bs-secondary-color);
+  cursor: pointer;
+}
+.theme-toggle:hover { color: var(--brand); }
+.theme-toggle .icon-sun { display: none; }
+[data-bs-theme="dark"] .theme-toggle .icon-moon { display: none; }
+[data-bs-theme="dark"] .theme-toggle .icon-sun { display: inline; }
+
+.btn-primary {
+  --bs-btn-bg: var(--brand);
+  --bs-btn-border-color: var(--brand);
+  --bs-btn-hover-bg: var(--brand-hover);
+  --bs-btn-hover-border-color: var(--brand-hover);
+  --bs-btn-active-bg: var(--brand-hover);
+  --bs-btn-active-border-color: var(--brand-hover);
+  --bs-btn-disabled-bg: var(--brand);
+  --bs-btn-disabled-border-color: var(--brand);
+}
+
+.nav-tabs {
+  --bs-nav-link-color: var(--bs-secondary-color);
+  --bs-nav-link-hover-color: var(--brand);
+  --bs-nav-tabs-link-active-color: var(--brand);
+  font-weight: 600;
+}
+
+/* Tables. */
+.table thead th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-weight: 600;
+  color: var(--bs-secondary-color);
+}
+
+.col-rank {
+  width: 3.5rem;
+  text-align: center;
+  font-weight: 700;
+}
+
+tr.leader .col-rank {
+  color: var(--brand);
+  box-shadow: inset 3px 0 0 var(--brand);
+}
+
+.team-cell,
+.cell-link {
+  color: var(--bs-body-color);
+  font-weight: 600;
+}
+.team-cell:hover,
+.cell-link:hover { color: var(--brand); }
+
+.team-logo {
+  border-radius: 6px;
+  object-fit: contain;
+  flex: none;
+}
+
+/* Team page total. */
+.team-total-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.team-total-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--bs-secondary-color);
+}
+
+/* Teams page cards. */
+.team-card { transition: border-color 0.15s ease; }
+.team-card:hover { border-color: var(--brand); }
+.card-weblink { position: relative; z-index: 2; }
+
+[data-bs-theme="dark"] .card {
+  --bs-card-bg: #141417;
+  --bs-card-border-color: #2c2c30;
+}
+
+/* Homepage events sidebar. */
+.events-group { margin-bottom: 1.25rem; }
+.events-heading {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 700;
+  color: var(--bs-secondary-color);
+  margin-bottom: 0.4rem;
+}
+.events-list {
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.event-item {
+  display: block;
+  padding: 0.55rem 0.8rem;
+  color: var(--bs-body-color);
+}
+.event-item + .event-item { border-top: 1px solid var(--bs-border-color); }
+.event-item:hover { background: var(--bs-tertiary-bg); }
+.event-item-name { display: block; font-weight: 600; }
+.event-item:hover .event-item-name { color: var(--brand); }
+.event-item-date {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--bs-secondary-color);
+}
+
+.flag { font-size: 0.9em; }

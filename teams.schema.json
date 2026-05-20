@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Human Flag League data",
+  "description": "Schema for teams.json. Referential checks (team event IDs must exist in the events map, team IDs must be unique) are enforced by the validation workflow, not by this schema.",
+  "type": "object",
+  "required": ["events", "teams"],
+  "additionalProperties": false,
+  "properties": {
+    "events": {
+      "type": "object",
+      "description": "Map of event ID -> event metadata.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["name", "starts_at", "ends_at", "weight"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "starts_at": { "type": "integer", "minimum": 0, "description": "Unix time, seconds, UTC." },
+          "ends_at": { "type": "integer", "minimum": 0, "description": "Unix time, seconds, UTC. The calendar year of this value decides which scoreboard tab the event lands in." },
+          "weight": { "type": "number", "minimum": 0, "description": "Event weight (CTFtime-style)." }
+        }
+      }
+    },
+    "teams": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "country", "events"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9-]+$", "description": "Stable URL identifier. Never rename it." },
+          "name": { "type": "string", "minLength": 1 },
+          "logo_url": { "type": "string", "description": "Optional. Absolute URL to the team logo (PNG)." },
+          "web": { "type": "string", "description": "Optional. Team website URL." },
+          "description": { "type": "string", "description": "Optional. Short one-line description shown on the Teams page." },
+          "country": { "type": "string", "pattern": "^[A-Za-z]{2}$", "description": "ISO 3166-1 alpha-2 code." },
+          "aliases": { "type": "array", "items": { "type": "string" } },
+          "events": {
+            "type": "object",
+            "description": "Map of event ID -> this team's result. Each key must exist in the top-level events map.",
+            "additionalProperties": {
+              "type": "object",
+              "required": ["score", "place"],
+              "additionalProperties": false,
+              "properties": {
+                "score": { "type": "number", "minimum": 0 },
+                "place": { "type": "integer", "minimum": 1, "description": "Final placement in that CTF." }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

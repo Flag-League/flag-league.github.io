@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Human Flag League</title>
+  <title>About - Human Flag League</title>
   <meta name="description" content="CTF League without Clankers. Made by humans, made for humans.">
 
   <link rel="icon" type="image/svg+xml" href="ctf-league.svg">
 
-  <meta property="og:title" content="Human Flag League">
+  <meta property="og:title" content="About - Human Flag League">
   <meta property="og:description" content="CTF League without Clankers. Made by humans, made for humans.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://flag-league.github.io/">
+  <meta property="og:url" content="https://flag-league.github.io/about.html">
   <meta property="og:image" content="https://flag-league.github.io/og-image.png">
   <meta name="twitter:card" content="summary">
 
@@ -31,37 +31,59 @@
       </button>
       <div class="collapse navbar-collapse" id="nav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.html">Scoreboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html">Scoreboard</a></li>
           <li class="nav-item"><a class="nav-link" href="teams.html">Teams</a></li>
-          <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="about.html">About</a></li>
         </ul>
       </div>
     </div>
   </nav>
 
   <main class="container py-4">
-    <h1 class="mb-1">Stop the slopping in CTFs.</h1>
-    <p class="hero-tagline mb-4">This CTF league is an attempt to make playing CTFs fun again.<br/>We follow a strict non-AI policy and don't care about Clankers and their teams.</p>
+    <h1 class="mb-1">About</h1>
+    <p class="lead text-body-secondary mb-4">How the league works.</p>
 
-    <noscript>
-      <div class="alert alert-warning">This site is built in your browser. Please enable JavaScript.</div>
-    </noscript>
+    <section class="mb-4">
+      <h2 class="h4">Rules</h2>
+      <p>
+        The Human Flag League is a capture-the-flag league played without AI.
+        While competing under the league, members do not use:
+      </p>
+      <ul>
+        <li>AI code completion or code generation</li>
+        <li>AI chat assistants for solving challenges</li>
+        <li>AI-generated search summaries</li>
+        <li>any other clankers</li>
+      </ul>
+      <p>It runs on trust. Each team makes sure its own members keep to this.</p>
+    </section>
 
-    <div class="row g-4">
-      <div class="col-lg-8">
-        <h2 class="h4 mb-3">Scoreboard</h2>
-        <ul class="nav nav-tabs" id="year-tabs" role="tablist"></ul>
-        <div class="tab-content pt-3" id="year-panes" aria-busy="true">
-          <div class="text-center text-secondary py-5">
-            <div class="spinner-border" role="status"><span class="visually-hidden">Loading</span></div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4">
-        <h2 class="h4 mb-3">Events</h2>
-        <div id="events-sidebar"></div>
-      </div>
-    </div>
+    <section class="mb-4">
+      <h2 class="h4">Scoring</h2>
+      <p>
+        Each CTF a team plays is worth league points, computed as
+        <code>points = (score / best) &times; weight</code>.<br/>
+        Score is the team's score in that CTF, best is the top score among the league teams that
+        played it, and weight is the CTF's weight.
+      </p>
+      <p>
+        A team's standing for a year is the sum of its points from every CTF
+        that ended that year.
+      </p>
+    </section>
+
+    <section class="mb-4">
+      <h2 class="h4">Apply</h2>
+      <p>Applications to join the league are currently closed.</p>
+    </section>
+
+    <section class="mb-4">
+      <h2 class="h4">Contact</h2>
+      <p>
+        Questions about the league? Reach us at
+        <span id="contact-email">enable JavaScript to view the address</span>.
+      </p>
+    </section>
   </main>
 
   <footer class="container border-top py-3 d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2 gap-sm-3">
@@ -75,6 +97,6 @@
 
   <script src="vendor/bootstrap.bundle.min.js" defer></script>
   <script type="module" src="js/theme.js"></script>
-  <script type="module" src="js/page-scoreboard.js"></script>
+  <script type="module" src="js/page-about.js"></script>
 </body>
 </html>
