@@ -672,6 +672,44 @@
       return el('div', { 'class': 'entry-summary' }, [btn, iconButton(deleteTitle, onDelete)]);
     }
 
+    // Event id -> whether data/scripts/<id>.js (a scoreboard userscript) exists.
+    var scriptProbe = {};
+
+    function scriptStatusNodes(id, ok) {
+      var path = 'data/scripts/' + id + '.js';
+      if (ok) {
+        return ['Userscript: ',
+          el('a', { href: path, target: '_blank', rel: 'noopener' }, path),
+          ' is available.'];
+      }
+      return ['No userscript at ' + path + ' yet.'];
+    }
+
+    function fillScriptHint(hint, ev) {
+      var id = (ev.id || '').trim();
+      if (!id) {
+        hint.textContent = 'Set an event id to check for a matching userscript.';
+        return;
+      }
+      if (Object.prototype.hasOwnProperty.call(scriptProbe, id)) {
+        hint.replaceChildren.apply(hint, scriptStatusNodes(id, scriptProbe[id]));
+        return;
+      }
+      hint.textContent = 'Checking for userscript data/scripts/' + id + '.js ...';
+      fetch('data/scripts/' + id + '.js', { method: 'HEAD' })
+        .then(function (res) { return res.ok; }, function () { return false; })
+        .then(function (ok) {
+          scriptProbe[id] = ok;
+          if ((ev.id || '').trim() === id) fillScriptHint(hint, ev);
+        });
+    }
+
+    function scriptHint(ev) {
+      var hint = el('div', { 'class': 'field-hint', style: 'margin-top:.5rem' });
+      fillScriptHint(hint, ev);
+      return hint;
+    }
+
     function eventCard(ev) {
       var card = el('div', { 'class': 'entry-card card', 'data-card': ev.uid });
       card.append(summaryRow(ev.uid, 'Delete event', function () { deleteEvent(ev); }));
@@ -682,8 +720,12 @@
     }
 
     function eventDetail(ev) {
-      var idIn = textInput('event:' + ev.uid + ':id', ev.id, function (v) { ev.id = v; refresh(); },
-        { placeholder: 'faust2026' });
+      var hint = scriptHint(ev);
+      var idIn = textInput('event:' + ev.uid + ':id', ev.id, function (v) {
+        ev.id = v;
+        fillScriptHint(hint, ev);
+        refresh();
+      }, { placeholder: 'faust2026' });
       var nameIn = textInput('event:' + ev.uid + ':name', ev.name, function (v) { ev.name = v; refresh(); },
         { placeholder: 'FAUST CTF 2026' });
       var weightIn = numInput('event:' + ev.uid + ':weight', ev.weight, function (v) { ev.weight = v; refresh(); },
@@ -700,7 +742,7 @@
         fieldWrap('Starts (UTC)', startIn, { col: 'col-sm-6' }),
         fieldWrap('Ends (UTC)', endIn, { col: 'col-sm-6', hint: seasonHint })
       ]);
-      return [grid, resultsSection(ev)];
+      return [grid, hint, resultsSection(ev)];
     }
 
     function resultsSection(ev) {

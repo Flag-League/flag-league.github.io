@@ -1,127 +1,38 @@
 {
   "events": {
-    "hinterland2024": {
-      "name": "Hinterland CTF 2024",
-      "starts_at": 1717848000,
-      "ends_at": 1717884000,
-      "weight": 24.5
+    "hacklu25": {
+      "name": "Hack.lu CTF 2025",
+      "starts_at": 1760724000,
+      "ends_at": 1760896800,
+      "weight": 98.02
     },
-    "mobius2024": {
-      "name": "Möbius CTF 2024",
-      "starts_at": 1735322400,
-      "ends_at": 1735495200,
-      "weight": 36.0
-    },
-    "nebula2025": {
-      "name": "Nebula Finals 2025",
-      "starts_at": 1744452000,
-      "ends_at": 1744516800,
-      "weight": 25.0
-    },
-    "hinterland2025": {
-      "name": "Hinterland CTF 2025",
-      "starts_at": 1749902400,
-      "ends_at": 1749938400,
-      "weight": 24.5
-    },
-    "mobius2025": {
-      "name": "Möbius CTF 2025",
-      "starts_at": 1766858400,
-      "ends_at": 1767276000,
-      "weight": 37.0
-    },
-    "glitchwald2026": {
-      "name": "Glitchwald CTF 2026",
-      "starts_at": 1773421200,
-      "ends_at": 1773514800,
-      "weight": 33.0
-    },
-    "phantomquals2026": {
-      "name": "Phantom Quals 2026",
-      "starts_at": 1779019200,
-      "ends_at": 1779624000,
-      "weight": 30.0
-    },
-    "hinterland2026": {
-      "name": "Hinterland CTF 2026",
-      "starts_at": 1781352000,
-      "ends_at": 1781438400,
-      "weight": 24.5
-    },
-    "zenith2026": {
-      "name": "Zenith CTF 2026",
-      "starts_at": 1782489600,
-      "ends_at": 1782662400,
-      "weight": 45.0
+    "defconquals2026": {
+      "name": "DEF CON CTF Quals 2026",
+      "starts_at": 1779483600,
+      "ends_at": 1779656400,
+      "weight": 63.22
     }
   },
   "teams": [
     {
-      "id": "shellcuddlers",
-      "name": "ShellCuddlers",
-      "logo_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Tux.png?width=96",
-      "web": "https://shellcuddlers.example",
-      "description": "Capture the Flag team from the Universität Hückeswagen.",
+      "id": "fluxfingers",
+      "name": "FluxFingers",
       "country": "DE",
-      "aliases": ["SC Hückeswagen"],
+      "events": {}
+    },
+    {
+      "id": "kitctf",
+      "name": "KITCTF",
+      "country": "DE",
       "events": {
-        "hinterland2024": { "score": 9800, "place": 3 },
-        "mobius2024": { "score": 7200, "place": 7 },
-        "nebula2025": { "score": 6400, "place": 6 },
-        "hinterland2025": { "score": 10400, "place": 2 },
-        "mobius2025": { "score": 8800, "place": 4 },
-        "glitchwald2026": { "score": 9400, "place": 2 }
+        "hacklu25": { "score": 1357, "place": 36 }
       }
     },
     {
-      "id": "segfault-spaetzle",
-      "name": "Segfault Spätzle",
-      "logo_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Nuvola_apps_ksysv.png?width=96",
-      "web": "https://segfault-spaetzle.example",
-      "description": "Capture the Flag team from the Universität Dinkelsbühl.",
+      "id": "fluxkittens",
+      "name": "FluxKITtens :3",
       "country": "DE",
-      "aliases": ["Spätzle"],
-      "events": {
-        "hinterland2024": { "score": 11200, "place": 1 },
-        "mobius2024": { "score": 9100, "place": 4 },
-        "nebula2025": { "score": 8900, "place": 2 },
-        "hinterland2025": { "score": 9900, "place": 3 },
-        "mobius2025": { "score": 11800, "place": 1 },
-        "glitchwald2026": { "score": 8200, "place": 5 }
-      }
-    },
-    {
-      "id": "buffer-brezn",
-      "name": "Buffer Brezn",
-      "logo_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Nuvola_apps_kuser.png?width=96",
-      "web": "https://buffer-brezn.example",
-      "description": "Capture the Flag team from the Universität Mittenwald.",
-      "country": "DE",
-      "aliases": ["Brezn"],
-      "events": {
-        "hinterland2024": { "score": 8400, "place": 5 },
-        "mobius2024": { "score": 6300, "place": 9 },
-        "hinterland2025": { "score": 11500, "place": 1 },
-        "mobius2025": { "score": 9600, "place": 2 },
-        "glitchwald2026": { "score": 10100, "place": 1 }
-      }
-    },
-    {
-      "id": "kernel-kobolde",
-      "name": "Kernel Kobolde",
-      "logo_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Crystal_Clear_app_browser.png?width=96",
-      "web": "https://kernel-kobolde.example",
-      "description": "Capture the Flag team from the Universität Wolfenbüttel.",
-      "country": "DE",
-      "aliases": ["KK Wolfenbüttel"],
-      "events": {
-        "hinterland2024": { "score": 7000, "place": 8 },
-        "mobius2024": { "score": 10500, "place": 2 },
-        "nebula2025": { "score": 8900, "place": 1 },
-        "hinterland2025": { "score": 7300, "place": 6 },
-        "mobius2025": { "score": 9200, "place": 3 },
-        "glitchwald2026": { "score": 8600, "place": 3 }
-      }
+      "events": {}
     }
   ]
 }

@@ -3,6 +3,7 @@ import {
   el, teamCell, dataTable, eventState, eventWhen,
   formatPoints, formatScore, showError, showNotFound, showLoading,
 } from './render.js';
+import { fetchScript, copyButton } from './page-scripts.js';
 
 export async function renderEvent(app, id) {
   showLoading(app);
@@ -58,9 +59,19 @@ export async function renderEvent(app, id) {
     );
   }
 
+  const script = eventState(event) === 'running' ? await fetchScript(id) : null;
+  const scriptBlock = script ? el('div', { class: 'mt-4' }, [
+    el('h2', { class: 'h5 mb-2' }, 'Userscript'),
+    el('p', { class: 'small text-body-secondary mb-2' },
+      'Install in a userscript manager such as Tampermonkey to filter the CTF to league teams.'),
+    el('pre', { class: 'script-code mb-2' }, el('code', {}, script)),
+    copyButton(() => script),
+  ]) : null;
+
   app.replaceChildren(
     el('p', { class: 'mb-3' }, el('a', { href: '/', class: 'back-link' }, '← Scoreboard')),
     header,
-    body
+    body,
+    ...(scriptBlock ? [scriptBlock] : []),
   );
 }

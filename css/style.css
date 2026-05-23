@@ -201,3 +201,36 @@ tr.leader .col-rank {
 }
 
 .flag { font-size: 0.9em; }
+
+/* Scripts page. */
+.script-card { transition: border-color 0.15s ease; }
+.script-card:hover { border-color: var(--brand); }
+.script-code {
+  position: relative;
+  max-height: 10rem;
+  overflow: hidden;
+  margin: 0;
+  padding: 0.6rem 0.7rem;
+  background: var(--bs-tertiary-bg);
+  border-radius: 0.4rem;
+  font-size: 0.74rem;
+  line-height: 1.45;
+}
+.script-code::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 2.6rem;
+  background: linear-gradient(to bottom, transparent, var(--bs-tertiary-bg));
+}
+.script-copy { flex: none; }
+
+/* Green confirmation state, shared with the editor's copy button. */
+.btn.copied {
+  --bs-btn-bg: #198754;
+  --bs-btn-border-color: #198754;
+  --bs-btn-hover-bg: #198754;
+  --bs-btn-hover-border-color: #198754;
+  --bs-btn-active-bg: #198754;
+  --bs-btn-active-border-color: #198754;
+}

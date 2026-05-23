@@ -4,6 +4,7 @@ import { renderTeams } from './page-teams.js';
 import { renderTeam } from './page-team.js';
 import { renderEvent } from './page-event.js';
 import { renderAbout } from './page-about.js';
+import { renderScripts } from './page-scripts.js';
 import { showNotFound } from './render.js';
 
 const app = document.getElementById('app');
@@ -15,6 +16,7 @@ const routes = [
   { re: /^\/team\/([^/]+)\/?$/, nav: 'teams', run: (m) => renderTeam(app, decodeURIComponent(m[1])) },
   { re: /^\/event\/([^/]+)\/?$/, nav: '', run: (m) => renderEvent(app, decodeURIComponent(m[1])) },
   { re: /^\/about\/?$/, nav: 'about', run: () => renderAbout(app) },
+  { re: /^\/scripts\/?$/, nav: '', run: () => renderScripts(app) },
 ];
 
 function setNav(name) {
