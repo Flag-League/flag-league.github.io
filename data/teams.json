@@ -33,6 +33,15 @@
       "name": "FluxKITtens :3",
       "country": "DE",
       "events": {}
+    },
+    {
+      "id": "pwn-la-chapelle",
+      "name": "Pwn-la-Chapelle",
+      "logo_url": "https://pwn-la-chapelle.eu/img/pwn_logo_file.png",
+      "web": "https://pwn-la-chapelle.eu/",
+      "country": "DE",
+      "aliases": ["haix-la-chapelle", "PLC", "HLC"],
+      "events": {}
     }
   ]
 }
