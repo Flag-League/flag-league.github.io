@@ -15,6 +15,14 @@
   },
   "teams": [
     {
+      "id": "platypwnies",
+      "name": "Platypwnies",
+      "web": "https://platypwnies.de/",
+      "logo_url": "https://platypwnies.de/logo.png",
+      "country": "DE",
+      "events": {}
+    },
+    {
       "id": "fluxfingers",
       "name": "FluxFingers",
       "country": "DE",
