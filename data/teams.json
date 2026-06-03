@@ -17,20 +17,27 @@
     {
       "id": "platypwnies",
       "name": "Platypwnies",
-      "web": "https://platypwnies.de/",
       "logo_url": "https://platypwnies.de/logo.png",
+      "web": "https://platypwnies.de/",
+      "description": "CTF team from HPI Potsdam",
       "country": "DE",
       "events": {}
     },
     {
       "id": "fluxfingers",
       "name": "FluxFingers",
+      "logo_url": "https://fluxfingers.net/logo.png",
+      "web": "https://fluxfingers.net/",
+      "description": "CTF team from Ruhr University Bochum",
       "country": "DE",
       "events": {}
     },
     {
       "id": "kitctf",
       "name": "KITCTF",
+      "logo_url": "https://kitctf.de/imgs/logo.svg",
+      "web": "https://kitctf.de/",
+      "description": "CTF team from Karlsruhe Institute of Technology",
       "country": "DE",
       "events": {
         "hacklu25": { "score": 1357, "place": 36 }
@@ -38,8 +45,9 @@
     },
     {
       "id": "fluxkittens",
-      "logo_url": "https://cloud.fluxfingers.net/s/9eFjQr2tyjWgbis/preview",
       "name": "FluxKITtens :3",
+      "logo_url": "https://cloud.fluxfingers.net/s/9eFjQr2tyjWgbis/preview",
+      "description": "Merger of FluxFingers and KITCTF",
       "country": "DE",
       "events": {
         "defconquals2026": { "score": 478, "place": 96 }
@@ -50,10 +58,10 @@
       "name": "Pwn-la-Chapelle",
       "logo_url": "https://pwn-la-chapelle.eu/img/pwn_logo_file.png",
       "web": "https://pwn-la-chapelle.eu/",
+      "description": "CTF team from RWTH Aachen University",
       "country": "DE",
       "aliases": ["haix-la-chapelle", "PLC", "HLC"],
-      "events": {
-      }
+      "events": {}
     }
   ]
 }
