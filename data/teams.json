@@ -42,6 +42,9 @@
       "country": "DE",
       "aliases": ["haix-la-chapelle", "PLC", "HLC"],
       "events": {}
+      "events": {
+        "defconquals2026": { "score": 478, "place": 96 }
+      }
     }
   ]
 }
