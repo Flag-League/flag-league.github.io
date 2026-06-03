@@ -32,7 +32,9 @@
       "id": "fluxkittens",
       "name": "FluxKITtens :3",
       "country": "DE",
-      "events": {}
+      "events": {
+        "defconquals2026": { "score": 478, "place": 96 }
+      }
     }
   ]
 }
